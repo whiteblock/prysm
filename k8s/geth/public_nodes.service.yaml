@@ -69,3 +69,16 @@ spec:
      loadBalancer:
        consistentHash:
          useSourceIp: true
+---
+apiVersion: config.istio.io/v1alpha2
+kind: QuotaSpecBinding
+metadata:
+  name: public-rpc-nodes-quota
+  namespace: istio-system
+spec:
+  quotaSpecs:
+    - name: request-count
+      namespace: istio-system
+  services:
+    - name: public-rpc-nodes
+      namespace: pow
