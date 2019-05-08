@@ -204,73 +204,74 @@ func (bs *BeaconServer) Eth1Data(ctx context.Context, _ *ptypes.Empty) (*pb.Eth1
 // PendingDeposits returns a list of pending deposits that are ready for
 // inclusion in the next beacon block.
 func (bs *BeaconServer) PendingDeposits(ctx context.Context, _ *ptypes.Empty) (*pb.PendingDepositsResponse, error) {
-	bNum := bs.powChainService.LatestBlockHeight()
-	if bNum == nil {
-		return nil, errors.New("latest PoW block number is unknown")
-	}
-	// Only request deposits that have passed the ETH1 follow distance window.
-	bNum = bNum.Sub(bNum, big.NewInt(int64(params.BeaconConfig().Eth1FollowDistance)))
-	allDeps := bs.beaconDB.AllDeposits(ctx, bNum)
-	if len(allDeps) == 0 {
-		return &pb.PendingDepositsResponse{PendingDeposits: nil}, nil
-	}
-
-	// Need to fetch if the deposits up to the state's latest eth 1 data matches
-	// the number of all deposits in this RPC call. If not, then we return nil.
-	beaconState, err := bs.beaconDB.HeadState(ctx)
-	if err != nil {
-		return nil, fmt.Errorf("could not fetch beacon state: %v", err)
-	}
-	h := bytesutil.ToBytes32(beaconState.LatestEth1Data.BlockHash32)
-	_, latestEth1DataHeight, err := bs.powChainService.BlockExists(ctx, h)
-	if err != nil {
-		return nil, fmt.Errorf("could not fetch eth1data height: %v", err)
-	}
-	// If the state's latest eth1 data's block hash has a height of 100, we fetch all the deposits up to height 100.
-	// If this doesn't match the number of deposits stored in the cache, the generated trie will not be the same and
-	// root will fail to verify. This can happen in a scenario where we perhaps have a deposit from height 101,
-	// so we want to avoid any possible mismatches in these lengths.
-	upToLatestEth1DataDeposits := bs.beaconDB.AllDeposits(ctx, latestEth1DataHeight)
-	if len(upToLatestEth1DataDeposits) != len(allDeps) {
-		return &pb.PendingDepositsResponse{PendingDeposits: nil}, nil
-	}
-	depositData := [][]byte{}
-	for i := range upToLatestEth1DataDeposits {
-		depositData = append(depositData, upToLatestEth1DataDeposits[i].DepositData)
-	}
-
-	depositTrie, err := trieutil.GenerateTrieFromItems(depositData, int(params.BeaconConfig().DepositContractTreeDepth))
-	if err != nil {
-		return nil, fmt.Errorf("could not generate historical deposit trie from deposits: %v", err)
-	}
-
-	allPendingDeps := bs.beaconDB.PendingDeposits(ctx, bNum)
-
-	// Deposits need to be received in order of merkle index root, so this has to make sure
-	// deposits are sorted from lowest to highest.
-	var pendingDeps []*pbp2p.Deposit
-	for _, dep := range allPendingDeps {
-		if dep.MerkleTreeIndex >= beaconState.DepositIndex {
-			pendingDeps = append(pendingDeps, dep)
-		}
-	}
-
-	for i := range pendingDeps {
-		// Don't construct merkle proof if the number of deposits is more than max allowed in block.
-		if uint64(i) == params.BeaconConfig().MaxDeposits {
-			break
-		}
-		pendingDeps[i], err = constructMerkleProof(depositTrie, pendingDeps[i])
-		if err != nil {
-			return nil, err
-		}
-	}
-	// Limit the return of pending deposits to not be more than max deposits allowed in block.
-	var pendingDeposits []*pbp2p.Deposit
-	for i := 0; i < len(pendingDeps) && i < int(params.BeaconConfig().MaxDeposits); i++ {
-		pendingDeposits = append(pendingDeposits, pendingDeps[i])
-	}
-	return &pb.PendingDepositsResponse{PendingDeposits: pendingDeposits}, nil
+	//bNum := bs.powChainService.LatestBlockHeight()
+	//if bNum == nil {
+	//	return nil, errors.New("latest PoW block number is unknown")
+	//}
+	//// Only request deposits that have passed the ETH1 follow distance window.
+	//bNum = bNum.Sub(bNum, big.NewInt(int64(params.BeaconConfig().Eth1FollowDistance)))
+	//allDeps := bs.beaconDB.AllDeposits(ctx, bNum)
+	//if len(allDeps) == 0 {
+	//	return &pb.PendingDepositsResponse{PendingDeposits: nil}, nil
+	//}
+	//
+	//// Need to fetch if the deposits up to the state's latest eth 1 data matches
+	//// the number of all deposits in this RPC call. If not, then we return nil.
+	//beaconState, err := bs.beaconDB.HeadState(ctx)
+	//if err != nil {
+	//	return nil, fmt.Errorf("could not fetch beacon state: %v", err)
+	//}
+	//h := bytesutil.ToBytes32(beaconState.LatestEth1Data.BlockHash32)
+	//_, latestEth1DataHeight, err := bs.powChainService.BlockExists(ctx, h)
+	//if err != nil {
+	//	return nil, fmt.Errorf("could not fetch eth1data height: %v", err)
+	//}
+	//// If the state's latest eth1 data's block hash has a height of 100, we fetch all the deposits up to height 100.
+	//// If this doesn't match the number of deposits stored in the cache, the generated trie will not be the same and
+	//// root will fail to verify. This can happen in a scenario where we perhaps have a deposit from height 101,
+	//// so we want to avoid any possible mismatches in these lengths.
+	//upToLatestEth1DataDeposits := bs.beaconDB.AllDeposits(ctx, latestEth1DataHeight)
+	//if len(upToLatestEth1DataDeposits) != len(allDeps) {
+	//	return &pb.PendingDepositsResponse{PendingDeposits: nil}, nil
+	//}
+	//depositData := [][]byte{}
+	//for i := range upToLatestEth1DataDeposits {
+	//	depositData = append(depositData, upToLatestEth1DataDeposits[i].DepositData)
+	//}
+	//
+	//depositTrie, err := trieutil.GenerateTrieFromItems(depositData, int(params.BeaconConfig().DepositContractTreeDepth))
+	//if err != nil {
+	//	return nil, fmt.Errorf("could not generate historical deposit trie from deposits: %v", err)
+	//}
+	//
+	//allPendingDeps := bs.beaconDB.PendingDeposits(ctx, bNum)
+	//
+	//// Deposits need to be received in order of merkle index root, so this has to make sure
+	//// deposits are sorted from lowest to highest.
+	//var pendingDeps []*pbp2p.Deposit
+	//for _, dep := range allPendingDeps {
+	//	if dep.MerkleTreeIndex >= beaconState.DepositIndex {
+	//		pendingDeps = append(pendingDeps, dep)
+	//	}
+	//}
+	//
+	//for i := range pendingDeps {
+	//	// Don't construct merkle proof if the number of deposits is more than max allowed in block.
+	//	if uint64(i) == params.BeaconConfig().MaxDeposits {
+	//		break
+	//	}
+	//	pendingDeps[i], err = constructMerkleProof(depositTrie, pendingDeps[i])
+	//	if err != nil {
+	//		return nil, err
+	//	}
+	//}
+	//// Limit the return of pending deposits to not be more than max deposits allowed in block.
+	//var pendingDeposits []*pbp2p.Deposit
+	//for i := 0; i < len(pendingDeps) && i < int(params.BeaconConfig().MaxDeposits); i++ {
+	//	pendingDeposits = append(pendingDeposits, pendingDeps[i])
+	//}
+	//return &pb.PendingDepositsResponse{PendingDeposits: pendingDeposits}, nil
+	return &pb.PendingDepositsResponse{PendingDeposits: nil}, nil
 }
 
 // RecentBlockRoots returns the list of canonical slots and roots. It starts from the head
