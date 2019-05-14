@@ -256,6 +256,13 @@ func (bs *BeaconServer) PendingDeposits(ctx context.Context, _ *ptypes.Empty) (*
 	// deposits are sorted from lowest to highest.
 	var pendingDeps []*pbp2p.Deposit
 	for _, dep := range allPendingDeps {
+		if len(pendingDeps) > 0 {
+			lastDep := pendingDeps[len(pendingDeps)-1]
+			if dep.MerkleTreeIndex != lastDep.MerkleTreeIndex+1 {
+				continue
+			}
+		}
+
 		if dep.MerkleTreeIndex >= beaconState.DepositIndex {
 			pendingDeps = append(pendingDeps, dep)
 		}
