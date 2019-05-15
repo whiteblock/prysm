@@ -3,6 +3,7 @@ package main
 
 import (
 	"fmt"
+	"io"
 	"os"
 	"runtime"
 
@@ -15,7 +16,7 @@ import (
 	"github.com/prysmaticlabs/prysm/shared/version"
 	"github.com/sirupsen/logrus"
 	"github.com/urfave/cli"
-	"github.com/x-cray/logrus-prefixed-formatter"
+	prefixed "github.com/x-cray/logrus-prefixed-formatter"
 )
 
 func startNode(ctx *cli.Context) error {
@@ -95,6 +96,14 @@ func main() {
 			break
 		default:
 			return fmt.Errorf("unknown log format %s", format)
+		}
+		writeFile := ctx.GlobalString(cmd.WriteLogsToFile.Value)
+		log.Info(writeFile)
+		if writeFile != "" {
+			log.Info("Writing file")
+			fl, _ := os.Open(writeFile)
+			mw := io.MultiWriter(os.Stdout, fl)
+			logrus.SetOutput(mw)
 		}
 
 		runtime.GOMAXPROCS(runtime.NumCPU())

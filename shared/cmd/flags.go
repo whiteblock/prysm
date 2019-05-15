@@ -105,4 +105,10 @@ var (
 		Usage: "Specify log formatting. Supports: text, json, fluentd.",
 		Value: "text",
 	}
+	// WriteLogsToFile writes logs to the specified file.
+	WriteLogsToFile = cli.StringFlag{
+		Name:  "write-logs",
+		Usage: "Writes logs to specified files",
+		Value: "",
+	}
 )
