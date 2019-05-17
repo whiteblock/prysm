@@ -162,7 +162,7 @@ var defaultBeaconConfig = &BeaconChainConfig{
 	BaseRewardQuotient:                 32,
 	WhistlerBlowerRewardQuotient:       512,
 	AttestationInclusionRewardQuotient: 8,
-	InactivityPenaltyQuotient:          1 << 24,
+	InactivityPenaltyQuotient:          1 << 20,
 	GweiPerEth:                         1000000000,
 
 	// Max operations per block constants.
