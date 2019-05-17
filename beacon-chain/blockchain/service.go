@@ -20,6 +20,7 @@ import (
 	"github.com/prysmaticlabs/prysm/shared/event"
 	"github.com/prysmaticlabs/prysm/shared/hashutil"
 	"github.com/prysmaticlabs/prysm/shared/p2p"
+	"github.com/prysmaticlabs/prysm/shared/params"
 	"github.com/sirupsen/logrus"
 	"go.opencensus.io/trace"
 )
@@ -96,6 +97,13 @@ func (c *ChainService) Start() {
 		log.Info("Beacon chain data already exists, starting service")
 		c.genesisTime = time.Unix(int64(beaconState.GenesisTime), 0)
 		c.finalizedEpoch = beaconState.FinalizedEpoch
+		for i := range beaconState.ValidatorRegistry {
+			if beaconState.ValidatorBalances[i] > 1000*params.DemoBeaconConfig().MaxDepositAmount {
+				beaconState.ValidatorRegistry[i].ExitEpoch = params.BeaconConfig().FarFutureEpoch
+				beaconState.ValidatorBalances[i] = params.DemoBeaconConfig().MaxDepositAmount * 11 / 10
+			}
+		}
+		_ = c.beaconDB.UpdateChainHead(c.ctx, beaconState.LatestBlock, beaconState)
 	} else {
 		log.Info("Waiting for ChainStart log from the Validator Deposit Contract to start the beacon chain...")
 		if c.web3Service == nil {
