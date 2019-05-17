@@ -530,11 +530,12 @@ func allValidatorsIndices(state *pb.BeaconState) []uint64 {
 //        MAX_DEPOSIT_AMOUNT,
 //        total_balance // (2 * MAX_BALANCE_CHURN_QUOTIENT))
 func maxBalanceChurn(totalBalance uint64) uint64 {
-	maxBalanceChurn := totalBalance / (2 * params.BeaconConfig().MaxBalanceChurnQuotient)
-	if maxBalanceChurn > params.BeaconConfig().MaxDepositAmount {
-		return maxBalanceChurn
-	}
-	return params.BeaconConfig().MaxDepositAmount
+	return totalBalance
+	//	maxBalanceChurn := totalBalance / (2 * params.BeaconConfig().MaxBalanceChurnQuotient)
+	//	if maxBalanceChurn > params.BeaconConfig().MaxDepositAmount {
+	//		return maxBalanceChurn
+	//	}
+	//	return params.BeaconConfig().MaxDepositAmount
 }
 
 // eligibleToExit checks if a validator is eligible to exit whether it was

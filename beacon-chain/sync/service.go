@@ -2,8 +2,6 @@ package sync
 
 import (
 	"context"
-	"errors"
-	"fmt"
 
 	"github.com/prysmaticlabs/prysm/beacon-chain/db"
 	"github.com/prysmaticlabs/prysm/beacon-chain/operations"
@@ -92,29 +90,30 @@ func (ss *Service) Stop() error {
 // Status checks the status of the node. It returns nil if it's synced
 // with the rest of the network and no errors occurred. Otherwise, it returns an error.
 func (ss *Service) Status() error {
-	if !ss.querierFinished && !ss.Querier.atGenesis {
-		return errors.New("querier is still running")
-	}
-
-	if !ss.Querier.chainStarted {
-		return nil
-	}
-
-	if ss.Querier.atGenesis {
-		return nil
-	}
-
-	blk, err := ss.Querier.db.ChainHead()
-	if err != nil {
-		return fmt.Errorf("could not retrieve chain head %v", err)
-	}
-	if blk == nil {
-		return errors.New("no chain head exists in db")
-	}
-	if !ss.InitialSync.NodeIsSynced() {
-		return errors.New("not initially synced")
-	}
 	return nil
+	//	if !ss.querierFinished && !ss.Querier.atGenesis {
+	//		return errors.New("querier is still running")
+	//	}
+	//
+	//	if !ss.Querier.chainStarted {
+	//		return nil
+	//	}
+	//
+	//	if ss.Querier.atGenesis {
+	//		return nil
+	//	}
+	//
+	//	blk, err := ss.Querier.db.ChainHead()
+	//	if err != nil {
+	//		return fmt.Errorf("could not retrieve chain head %v", err)
+	//	}
+	//	if blk == nil {
+	//		return errors.New("no chain head exists in db")
+	//	}
+	//	if !ss.InitialSync.NodeIsSynced() {
+	//		return errors.New("not initially synced")
+	//	}
+	//	return nil
 }
 
 func (ss *Service) run() {
@@ -125,7 +124,7 @@ func (ss *Service) run() {
 	}
 	ss.querierFinished = true
 
-	if synced {
+	if synced || true {
 		ss.RegularSync.Start()
 		return
 	}
