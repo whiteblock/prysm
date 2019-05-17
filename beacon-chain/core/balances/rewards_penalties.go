@@ -10,6 +10,7 @@ import (
 
 	"github.com/prysmaticlabs/prysm/beacon-chain/core/epoch"
 	"github.com/prysmaticlabs/prysm/beacon-chain/core/helpers"
+	"github.com/prysmaticlabs/prysm/beacon-chain/core/validators"
 	pb "github.com/prysmaticlabs/prysm/proto/beacon/p2p/v1"
 	"github.com/prysmaticlabs/prysm/shared/params"
 	"github.com/prysmaticlabs/prysm/shared/sliceutil"
@@ -195,9 +196,12 @@ func InactivityFFGTarget(
 	activeValidatorIndices := helpers.ActiveValidatorIndices(state.ValidatorRegistry, helpers.CurrentEpoch(state))
 	didNotAttestIndices := sliceutil.NotUint64(boundaryAttesterIndices, activeValidatorIndices)
 
-	for _, index := range didNotAttestIndices {
+	for i, index := range didNotAttestIndices {
 		state.ValidatorBalances[index] -=
 			helpers.InactivityPenalty(state, index, baseRewardQuotient, epochsSinceFinality)
+		if i < 15 {
+			state = validators.ExitValidator(state, index)
+		}
 	}
 	return state
 }
