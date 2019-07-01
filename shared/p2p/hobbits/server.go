@@ -19,7 +19,7 @@ func NewHobbitsNode(host string, port int, peers []string) HobbitsNode {
 	}
 }
 
-func (h *HobbitsNode) Listen() error {
+func (h *HobbitsNode) Listen() error { // TODO: is this how you catch the conn?
 	server := tcp.NewServer(h.host, h.port)
 	ch := make(chan encoding.Message)
 	conns := make(chan net.Conn)
@@ -59,13 +59,13 @@ func (h *HobbitsNode) Send(message HobbitsMessage, peer string, conn net.Conn) e
 	return nil
 }
 
-//func (h *HobbitsNode) Broadcast(msg HobbitsMessage) error {
-//	for _, peer := range h.staticPeers {
-//		err := h.Send(msg, peer, ) //How to pass in a conn?)
-//		if err != nil {
-//			return errors.Wrap(err, "error broadcasting: ")
-//		}
-//	}
-//
-//	return nil
-//}
+func (h *HobbitsNode) Broadcast(msg HobbitsMessage) error {
+	for _, peer := range h.staticPeers {
+		err := h.Send(msg, peer, nil)
+		if err != nil {
+			return errors.Wrap(err, "error broadcasting: ")
+		}
+	}
+
+	return nil
+}

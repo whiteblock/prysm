@@ -29,3 +29,14 @@ const ( // TODO: should I integrate this with messages.proto? would that make se
 	GET_ATTESTATION  //TODO: define in the spec what hex this corresponds to
 	ATTESTATION      // TODO: define in the spec what this means
 )
+
+var topicMapping map[reflect.Type]string
+// TODO: initialize with a const?
+
+type GossipHeader struct {
+	method_id      uint16   `bson:"method_id"`
+	topic          string   `bson:"topic"`
+	timestamp      uint32   `bson:"timestamp"`
+	message_hash   [32]byte `bson:"message_hash"`
+	hash_signature [32]byte `bson:"hash_signature"`
+}
