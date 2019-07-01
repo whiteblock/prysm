@@ -19,53 +19,35 @@ func NewHobbitsNode(host string, port int, peers []string) HobbitsNode {
 	}
 }
 
-func (h *HobbitsNode) Listen() error { // TODO: is this how you catch the conn?
-	server := tcp.NewServer(h.host, h.port)
-	ch := make(chan encoding.Message)
-	conns := make(chan net.Conn)
+func (h *HobbitsNode) Listen() error {
+	h.server = tcp.NewServer(h.host, h.port)
 
-	go server.Listen(func(conn net.Conn, message encoding.Message){
-		ch <- message
-		conns <- conn
-
+	return h.server.Listen(func(conn net.Conn, message encoding.Message) {
+		h.processHobbitsMessage(HobbitsMessage(message), conn)
 	})
-
-	msg := <- ch
-	conn := <-conns
-
-	go h.processHobbitsMessage(HobbitsMessage(msg), conn)
-
-	return nil
 }
 
-func (h *HobbitsNode) Send(message HobbitsMessage, peer string, conn net.Conn) error {
-	server := tcp.NewServer(peer, h.port)
-
-	if conn == nil {
-		conn, err := net.Dial("tcp", peer)
-		
-		err = server.SendMessage(conn, message)
-		if err != nil {
-			return errors.Wrap(err, "error sending message: ")
-		}
-		return nil
-	}
-
-	err := server.SendMessage(conn, encoding.Message(message))
-	if err != nil {
-		return errors.Wrap(err, "error sending hobbits message: ")
-	}
-
-	return nil
-}
-
-func (h *HobbitsNode) Broadcast(msg HobbitsMessage) error {
+func (h *HobbitsNode) Broadcast(message HobbitsMessage) error { // TODO: can i pre-open connections and just loop over open conns instead?
 	for _, peer := range h.staticPeers {
-		err := h.Send(msg, peer, nil)
+		conn, err := net.Dial("tcp", peer)
+
+		err = h.server.SendMessage(conn, encoding.Message(message))
 		if err != nil {
 			return errors.Wrap(err, "error broadcasting: ")
 		}
+
+		conn.Close()
 	}
 
 	return nil
 }
+
+//if conn == nil {
+//	conn, err := net.Dial("tcp", peer)
+//
+//	err = server.SendMessage(conn, encoding.Message(message))
+//	if err != nil {
+//		return errors.Wrap(err, "error sending message: ")
+//	}
+//	return nil
+//}

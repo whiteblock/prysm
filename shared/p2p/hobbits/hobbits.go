@@ -4,6 +4,7 @@ import (
 	"reflect"
 
 	"github.com/renaynay/go-hobbits/encoding"
+	"github.com/renaynay/go-hobbits/tcp"
 	"github.com/renaynay/prysm/shared/p2p"
 )
 
@@ -12,6 +13,7 @@ type HobbitsNode struct {
 	port        int
 	staticPeers []string
 	feeds       map[reflect.Type]p2p.Feed
+	server      *tcp.Server
 }
 
 type HobbitsMessage encoding.Message
@@ -34,6 +36,8 @@ var topicMapping map[reflect.Type]string
 // TODO: initialize with a const?
 
 type GossipHeader struct {
+	// TODO: if i don't care about the other values, how do I remove them so
+	// TODO:  I don't spend too much unnecessary time unmarshaling?
 	method_id      uint16   `bson:"method_id"`
 	topic          string   `bson:"topic"`
 	timestamp      uint32   `bson:"timestamp"`
