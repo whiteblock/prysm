@@ -2,6 +2,8 @@ package hobbits
 
 import (
 	"net"
+	"reflect"
+
 	"github.com/renaynay/go-hobbits/encoding"
 	"gopkg.in/mgo.v2/bson"
 
@@ -39,15 +41,14 @@ func (h *HobbitsNode) processRPC(message HobbitsMessage, conn net.Conn) error {
 	case HELLO:
 		// TODO: retrieve data and send it
 
-		h.staticPeers = append(h.staticPeers, conn.RemoteAddr().String())
+		h.staticPeers = append(h.staticPeers, conn)
 
 		err := h.server.SendMessage(conn, encoding.Message(message))
 		if err != nil {
 			return errors.Wrap(err, "error sending hobbits message: ")
 		}
 	case GOODBYE:
-		rem := conn.RemoteAddr().String()
-		err := h.removePeer(rem)
+		err := h.removePeer(conn)
 		if err != nil {
 			return errors.Wrap(err, "error handling GOODBYE: ")
 		}
@@ -70,11 +71,11 @@ func (h *HobbitsNode) processRPC(message HobbitsMessage, conn net.Conn) error {
 	return nil
 }
 
-func (h *HobbitsNode) removePeer(peer string) error {
+func (h *HobbitsNode) removePeer(peer net.Conn) error {
 	index := 0
 
 	for i, p := range h.staticPeers {
-		if peer == p {
+		if reflect.DeepEqual(peer, p) {
 			index = i
 		}
 	}

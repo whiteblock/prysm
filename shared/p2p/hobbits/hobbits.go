@@ -1,6 +1,7 @@
 package hobbits
 
 import (
+	"net"
 	"reflect"
 
 	"github.com/renaynay/go-hobbits/encoding"
@@ -11,7 +12,7 @@ import (
 type HobbitsNode struct {
 	host        string
 	port        int
-	staticPeers []string
+	staticPeers []net.Conn
 	feeds       map[reflect.Type]p2p.Feed
 	server      *tcp.Server
 }
@@ -32,15 +33,8 @@ const ( // TODO: should I integrate this with messages.proto? would that make se
 	ATTESTATION      // TODO: define in the spec what this means
 )
 
-var topicMapping map[reflect.Type]string
-// TODO: initialize with a const?
+var topicMapping map[reflect.Type]string // TODO: initialize with a const?
 
 type GossipHeader struct {
-	// TODO: if i don't care about the other values, how do I remove them so
-	// TODO:  I don't spend too much unnecessary time unmarshaling?
-	method_id      uint16   `bson:"method_id"`
 	topic          string   `bson:"topic"`
-	timestamp      uint32   `bson:"timestamp"`
-	message_hash   [32]byte `bson:"message_hash"`
-	hash_signature [32]byte `bson:"hash_signature"`
 }
