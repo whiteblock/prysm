@@ -8,10 +8,10 @@ import (
 )
 
 type HobbitsNode struct {
-	host string
-	port int
+	host        string
+	port        int
 	staticPeers []string
-	feeds map[reflect.Type]p2p.Feed
+	feeds       map[reflect.Type]p2p.Feed
 }
 
 type HobbitsMessage encoding.Message
@@ -26,6 +26,6 @@ const ( // TODO: should I integrate this with messages.proto? would that make se
 	BLOCK_HEADERS
 	GET_BLOCK_BODIES
 	BLOCK_BODIES
-	GET_ATTESTATION = //TODO: define in the spec what hex this corresponds to
-	ATTESTATION = // TODO: define in the spec what this means
+	GET_ATTESTATION  //TODO: define in the spec what hex this corresponds to
+	ATTESTATION      // TODO: define in the spec what this means
 )
