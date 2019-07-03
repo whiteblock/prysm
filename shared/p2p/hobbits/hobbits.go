@@ -10,11 +10,12 @@ import (
 )
 
 type HobbitsNode struct {
-	host        string
-	port        int
-	staticPeers []net.Conn
-	feeds       map[reflect.Type]p2p.Feed
-	server      *tcp.Server
+	host      string
+	port      int
+	peers     []string
+	peerConns []net.Conn
+	feeds     map[reflect.Type]p2p.Feed
+	server    *tcp.Server
 }
 
 type HobbitsMessage encoding.Message
@@ -37,4 +38,9 @@ var topicMapping map[reflect.Type]string // TODO: initialize with a const?
 
 type GossipHeader struct {
 	topic          string   `bson:"topic"`
+}
+
+type RPCBody struct { // TODO: make an RPC Body to catch the method_id... looks like the header and body are smashed
+					// TODO: in the spec
+
 }

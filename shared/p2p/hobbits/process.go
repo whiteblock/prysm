@@ -41,7 +41,7 @@ func (h *HobbitsNode) processRPC(message HobbitsMessage, conn net.Conn) error {
 	case HELLO:
 		// TODO: retrieve data and send it
 
-		h.staticPeers = append(h.staticPeers, conn)
+		h.peerConns = append(h.peerConns, conn)
 
 		err := h.server.SendMessage(conn, encoding.Message(message))
 		if err != nil {
@@ -74,7 +74,7 @@ func (h *HobbitsNode) processRPC(message HobbitsMessage, conn net.Conn) error {
 func (h *HobbitsNode) removePeer(peer net.Conn) error {
 	index := 0
 
-	for i, p := range h.staticPeers {
+	for i, p := range h.peerConns {
 		if reflect.DeepEqual(peer, p) {
 			index = i
 		}
@@ -83,7 +83,7 @@ func (h *HobbitsNode) removePeer(peer net.Conn) error {
 		return errors.New("error removing peer from node's static peers")
 	}
 
-	h.staticPeers = append(h.staticPeers[:index], h.staticPeers[index+1:]...) // TODO: is there a better way to delete
+	h.peerConns = append(h.peerConns[:index], h.peerConns[index+1:]...) // TODO: is there a better way to delete
 																			// TODO: an element from an array by its value?
 
 	return nil

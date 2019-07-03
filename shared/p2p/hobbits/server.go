@@ -10,13 +10,32 @@ import (
 	"github.com/renaynay/prysm/shared/p2p"
 )
 
-func NewHobbitsNode(host string, port int) HobbitsNode {
+func NewHobbitsNode(host string, port int, peers []string) HobbitsNode {
 	return HobbitsNode{
-		host:        host,
-		port:        port,
-		staticPeers: []net.Conn{},
-		feeds:       map[reflect.Type]p2p.Feed{},
+		host:      host,
+		port:      port,
+		peers:     peers,
+		peerConns: []net.Conn{},
+		feeds:     map[reflect.Type]p2p.Feed{},
 	}
+}
+
+func (h *HobbitsNode) OpenConns(peers []string) error { // TODO: check to see if there is an err that you can actually handle
+														// TODO: use an atomic swap
+	conns := make(chan net.Conn)
+
+	for _, p := range peers {
+		go func() {
+			conn, _ := net.Dial("tcp", p)
+
+			conns <- conn
+		}
+	}
+
+	h.peerConns = append(h.peerConns, ) // TODO:
+
+
+	return nil
 }
 
 func (h *HobbitsNode) Listen() error {
@@ -27,8 +46,8 @@ func (h *HobbitsNode) Listen() error {
 	})
 }
 
-func (h *HobbitsNode) Broadcast(message HobbitsMessage) error { // TODO: can i pre-open connections and just loop over open conns instead?
-	for _, peer := range h.staticPeers {
+func (h *HobbitsNode) Broadcast(message HobbitsMessage) error {
+	for _, peer := range h.peerConns {
 		err := h.server.SendMessage(peer, encoding.Message(message))
 		if err != nil {
 			return errors.Wrap(err, "error broadcasting: ")
