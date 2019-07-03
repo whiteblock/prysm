@@ -12,7 +12,7 @@ import (
 type HobbitsNode struct {
 	host      string
 	port      int
-	peers     []string
+	staticPeers     []string
 	peerConns []net.Conn
 	feeds     map[reflect.Type]p2p.Feed
 	server    *tcp.Server
