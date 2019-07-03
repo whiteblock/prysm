@@ -3,6 +3,7 @@ package hobbits
 import (
 	"net"
 	"reflect"
+	"time"
 
 	"github.com/pkg/errors"
 	"github.com/renaynay/go-hobbits/encoding"
@@ -25,11 +26,11 @@ func (h *HobbitsNode) OpenConns() error { // TODO: check to see if there is an e
 	conns := make(chan net.Conn)
 
 	for _, p := range h.staticPeers {
-		go func(){
-			conn, _ := net.Dial("tcp", p)
+		go func() {
+			conn, _ := net.DialTimeout("tcp", p, time.ParseDuration("3s"))
 
 			conns <- conn
-		}
+		}()
 	}
 
 	h.peerConns = append(h.peerConns, ) // TODO:
