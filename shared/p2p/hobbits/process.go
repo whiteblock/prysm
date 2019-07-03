@@ -32,7 +32,7 @@ func (h *HobbitsNode) processHobbitsMessage(message HobbitsMessage, conn net.Con
 }
 
 func (h *HobbitsNode) processRPC(message HobbitsMessage, conn net.Conn) error {
-	method, err := h.parseMethodID(message.Header)
+	method, err := h.parseMethodID(message.Header) // TODO: this is confusing b/c header and body for RPC are smushed together?
 	if err != nil {
 		return errors.Wrap(err, "could not parse method_id: ")
 	}
@@ -55,11 +55,12 @@ func (h *HobbitsNode) processRPC(message HobbitsMessage, conn net.Conn) error {
 	case GET_STATUS:
 		// TODO: retrieve data and call h.Send
 	case GET_BLOCK_HEADERS:
+
 		// TODO: retrieve data and call h.Send
 	case BLOCK_HEADERS:
 		// TODO: call Broadcast?
 	case GET_BLOCK_BODIES:
-		// TODO: retrieve data and call h.Send
+		// TODO: how will this work if batchedBeaconBlockRequest uses finalizedRoot and CanonicalRoot?
 	case BLOCK_BODIES:
 		// TODO: call Broadcast?
 	case GET_ATTESTATION:

@@ -14,18 +14,18 @@ func NewHobbitsNode(host string, port int, peers []string) HobbitsNode {
 	return HobbitsNode{
 		host:      host,
 		port:      port,
-		peers:     peers,
+		staticPeers:     peers,
 		peerConns: []net.Conn{},
 		feeds:     map[reflect.Type]p2p.Feed{},
 	}
 }
 
-func (h *HobbitsNode) OpenConns(peers []string) error { // TODO: check to see if there is an err that you can actually handle
+func (h *HobbitsNode) OpenConns() error { // TODO: check to see if there is an err that you can actually handle
 														// TODO: use an atomic swap
 	conns := make(chan net.Conn)
 
-	for _, p := range peers {
-		go func() {
+	for _, p := range h.staticPeers {
+		go func(){
 			conn, _ := net.Dial("tcp", p)
 
 			conns <- conn

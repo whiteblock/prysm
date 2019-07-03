@@ -22,7 +22,7 @@ type HobbitsMessage encoding.Message
 
 type RPCMethod int
 
-const ( // TODO: should I integrate this with messages.proto? would that make sense?
+const (
 	HELLO RPCMethod = iota
 	GOODBYE
 	GET_STATUS
@@ -40,7 +40,7 @@ type GossipHeader struct {
 	topic          string   `bson:"topic"`
 }
 
-type RPCBody struct { // TODO: make an RPC Body to catch the method_id... looks like the header and body are smashed
+type RPC struct { // TODO: make an RPC Body to catch the method_id... looks like the header and body are smashed
 					// TODO: in the spec
 
 }
