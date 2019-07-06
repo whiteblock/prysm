@@ -63,13 +63,12 @@ func Hobbits(host string, port int, peers []string, db *db.BeaconDB) *HobbitsNod
 	node := NewHobbitsNode(host, port, peers, db)
 	node.Server = tcp.NewServer(node.Host, node.Port)
 
-	log.Trace("node has been constructed")
+	log.WithFields(log.Fields{"host":host,"port":port,"peers":peers}).Trace("node has been constructed")
 
 	return node
 }
 
 func (h *HobbitsNode) Start() {
 	go h.Listen()
-
 	go h.OpenConns()
 }
