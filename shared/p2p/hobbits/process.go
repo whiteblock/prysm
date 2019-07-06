@@ -21,7 +21,7 @@ func (h *HobbitsNode) processHobbitsMessage(message HobbitsMessage, conn net.Con
 
 		err := h.processRPC(message, conn)
 		if err != nil {
-			log.Trace("there was an error processing an RPC hobbits msg ") // TODO DELETE
+			log.WithFields(log.Fields{"err":err}).Trace("there was an error processing an RPC hobbits msg ") // TODO DELETE
 			return errors.Wrap(err, "error processing an RPC hobbits message")
 		}
 	case encoding.GOSSIP:
@@ -66,14 +66,16 @@ func (h *HobbitsNode) processRPC(message HobbitsMessage, conn net.Conn) error {
 
 		log.Trace("sending HELLO...?")
 	case GOODBYE:
+		log.Trace("hobbs: GOODBYTE")
 		err := h.removePeer(conn)
 		if err != nil {
 			return errors.Wrap(err, "error handling GOODBYE: ")
 		}
 	case GET_STATUS:
+		log.Trace("hobbs: GET_STATUS")
 		// TODO: retrieve data and call h.Send
 	case GET_BLOCK_HEADERS:
-
+		log.Trace("hobbs: GET_BLOCK_HEADERS")
 		// TODO: retrieve data and call h.Send
 	case BLOCK_HEADERS:
 		// TODO: call Broadcast?

@@ -2,7 +2,6 @@ package hobbits
 
 import (
 	"context"
-	"fmt"
 	"math/rand"
 	"net"
 	"reflect"
