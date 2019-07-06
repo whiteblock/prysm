@@ -19,8 +19,8 @@ import (
 	"github.com/renaynay/go-hobbits/encoding"
 )
 
-func NewHobbitsNode(host string, port int, peers []string, db *db.BeaconDB) HobbitsNode {
-	return HobbitsNode{
+func NewHobbitsNode(host string, port int, peers []string, db *db.BeaconDB) *HobbitsNode {
+	return &HobbitsNode{
 		NodeId:      strconv.Itoa(rand.Int()),
 		Host:        host,
 		Port:        port,

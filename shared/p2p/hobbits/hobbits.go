@@ -65,7 +65,7 @@ func Hobbits(host string, port int, peers []string, db *db.BeaconDB) *HobbitsNod
 
 	log.Trace("node has been constructed")
 
-	return &node
+	return node
 }
 
 func (h *HobbitsNode) Start() {
