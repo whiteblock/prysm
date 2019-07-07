@@ -64,10 +64,10 @@ func (h *HobbitsNode) Listen() error {
 	err := h.Server.Listen(func(conn net.Conn, message encoding.Message) {
 		err := h.processHobbitsMessage(HobbitsMessage(message), conn)
 		if err != nil {
-			log.Trace("error processing hobbits message")
+			log.Debug("error processing hobbits message")
 		}
 
-		log.Trace("a message has been received")
+		log.Debug("a message has been received")
 	})
 
 	if err != nil {

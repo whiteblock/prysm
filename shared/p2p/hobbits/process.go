@@ -17,7 +17,7 @@ import (
 func (h *HobbitsNode) processHobbitsMessage(message HobbitsMessage, conn net.Conn) error {
 	switch message.Protocol {
 	case encoding.RPC:
-		log.Trace("beginning to process the RPC message...")
+		log.Debug("beginning to process the RPC message...")
 
 		err := h.processRPC(message, conn)
 		if err != nil {
@@ -25,7 +25,7 @@ func (h *HobbitsNode) processHobbitsMessage(message HobbitsMessage, conn net.Con
 			return errors.Wrap(err, "error processing an RPC hobbits message")
 		}
 	case encoding.GOSSIP:
-		log.Trace("beginning to process the GOSSIP message...")
+		log.Debug("beginning to process the GOSSIP message...")
 
 		err := h.processGossip(message)
 		if err != nil {
@@ -35,24 +35,24 @@ func (h *HobbitsNode) processHobbitsMessage(message HobbitsMessage, conn net.Con
 		return nil
 	}
 
-	log.Trace("protocol unsupported")
+	log.Debug("protocol unsupported")
 	return errors.New("protocol unsupported")
 }
 
 func (h *HobbitsNode) processRPC(message HobbitsMessage, conn net.Conn) error {
 	method, err := h.parseMethodID(message.Header)
 	if err != nil {
-		log.Trace("method id could not be parsed from message header")
+		log.Debug("method id could not be parsed from message header")
 		return errors.Wrap(err, "could not parse method_id: ")
 	}
 
 	switch method {
 	case HELLO:
-		log.Trace("HELLO received")
+		log.Debug("HELLO received")
 
 		response := h.rpcHello()
 
-		log.Trace("a HELLO response has been built...")
+		log.Debug("a HELLO response has been built...")
 
 		responseBody, err := bson.Marshal(response)
 
@@ -65,22 +65,22 @@ func (h *HobbitsNode) processRPC(message HobbitsMessage, conn net.Conn) error {
 
 		err = h.Server.SendMessage(conn, encoding.Message(responseMessage))
 		if err != nil {
-			log.Trace("error sending a HELLO back") // TODO delete
+			log.Debug("error sending a HELLO back") // TODO delete
 			return errors.Wrap(err, "error sending hobbits message: ")
 		}
 
-		log.Trace("sending HELLO...")
+		log.Debug("sending HELLO...")
 	case GOODBYE:
-		log.Trace("hobbs: GOODBYTE")
+		log.Debug("hobbs: GOODBYTE")
 		err := h.removePeer(conn)
 		if err != nil {
 			return errors.Wrap(err, "error handling GOODBYE: ")
 		}
 	case GET_STATUS:
-		log.Trace("hobbs: GET_STATUS")
+		log.Debug("hobbs: GET_STATUS")
 		// TODO: retrieve data and call h.Send
 	case GET_BLOCK_HEADERS:
-		log.Trace("hobbs: GET_BLOCK_HEADERS")
+		log.Debug("hobbs: GET_BLOCK_HEADERS")
 		// TODO: retrieve data and call h.Send
 	case BLOCK_HEADERS:
 		// TODO: call Broadcast?
@@ -98,7 +98,7 @@ func (h *HobbitsNode) processRPC(message HobbitsMessage, conn net.Conn) error {
 }
 
 func (h *HobbitsNode) rpcHello() Hello { // TODO: this is garbage
-	log.Trace("building a HELLO response...")
+	log.Debug("building a HELLO response...")
 
 	var response Hello
 
@@ -156,7 +156,7 @@ func (h *HobbitsNode) removePeer(peer net.Conn) error {
 }
 
 func (h *HobbitsNode) processGossip(message HobbitsMessage) error {
-	log.Trace("processing GOSSIP message...")
+	log.Debug("processing GOSSIP message...")
 
 	_, err := h.parseTopic(message)
 	if err != nil {
@@ -169,14 +169,14 @@ func (h *HobbitsNode) processGossip(message HobbitsMessage) error {
 }
 
 func (h *HobbitsNode) parseMethodID(header []byte) (RPCMethod, error) {
-	log.Trace("attempting to parse method ID from header of RPC message...")
+	log.Debug("attempting to parse method ID from header of RPC message...")
 	fmt.Println("parsing method ID from header...") // TODO delete
 
 	unmarshaledHeader := &RPCHeader{}
 
 	err := bson.Unmarshal(header, unmarshaledHeader)
 	if err != nil {
-		log.Trace("could not unmarshal the header of the message: ") // TODO delete
+		log.Debug("could not unmarshal the header of the message: ") // TODO delete
 		return RPCMethod(0), errors.Wrap(err, "could not unmarshal the header of the message: ")
 	}
 

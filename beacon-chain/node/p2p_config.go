@@ -52,11 +52,11 @@ func configureP2P(ctx *cli.Context, db *db.BeaconDB) (p2p.P2pComposite, error) {
 		s := hobbits.Hobbits(ctx.GlobalString(cmd.P2PHost.Name), ctx.GlobalInt(cmd.P2PPort.Name), staticPeers, db)
 
 		logrus.Debug("")
-		logrus.Trace("constructed a hobbits node...")
+		logrus.Debug("constructed a hobbits node...")
 
 		s.Start()
 
-		logrus.Trace("called start on hobbits node...")
+		logrus.Debug("called start on hobbits node...")
 
 		return s, nil
 	}
