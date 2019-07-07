@@ -59,7 +59,7 @@ func (h *HobbitsNode)  OpenConns() error {
 }
 
 func (h *HobbitsNode) Listen() error {
-	log.WithFields(log.Fields{"port":h.Port,"host":h.Host}).Trace("hobbits node is listening")
+	log.WithFields(log.Fields{"port":h.Port,"host":h.Host}).Trace("prysm hobbits node is listening... ")
 
 	err := h.Server.Listen(func(conn net.Conn, message encoding.Message) {
 		h.processHobbitsMessage(HobbitsMessage(message), conn)

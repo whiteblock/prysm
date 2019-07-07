@@ -25,6 +25,8 @@ func (h *HobbitsNode) processHobbitsMessage(message HobbitsMessage, conn net.Con
 			return errors.Wrap(err, "error processing an RPC hobbits message")
 		}
 	case encoding.GOSSIP:
+		log.Trace("beginning to process the GOSSIP message...")
+
 		err := h.processGossip(message)
 		if err != nil {
 			return errors.Wrap(err, "error processing a GOSSIP hobbits message")
@@ -33,6 +35,7 @@ func (h *HobbitsNode) processHobbitsMessage(message HobbitsMessage, conn net.Con
 		return nil
 	}
 
+	log.Trace("protocol unsupported")
 	return errors.New("protocol unsupported")
 }
 
@@ -49,6 +52,8 @@ func (h *HobbitsNode) processRPC(message HobbitsMessage, conn net.Conn) error {
 
 		response := h.rpcHello()
 
+		log.Trace("a HELLO response has been built...")
+
 		responseBody, err := bson.Marshal(response)
 
 		responseMessage := HobbitsMessage{
@@ -64,7 +69,7 @@ func (h *HobbitsNode) processRPC(message HobbitsMessage, conn net.Conn) error {
 			return errors.Wrap(err, "error sending hobbits message: ")
 		}
 
-		log.Trace("sending HELLO...?")
+		log.Trace("sending HELLO...")
 	case GOODBYE:
 		log.Trace("hobbs: GOODBYTE")
 		err := h.removePeer(conn)
@@ -93,6 +98,8 @@ func (h *HobbitsNode) processRPC(message HobbitsMessage, conn net.Conn) error {
 }
 
 func (h *HobbitsNode) rpcHello() Hello { // TODO: this is garbage
+	log.Trace("building a HELLO response...")
+
 	var response Hello
 
 	response.NodeID = h.NodeId
@@ -149,6 +156,8 @@ func (h *HobbitsNode) removePeer(peer net.Conn) error {
 }
 
 func (h *HobbitsNode) processGossip(message HobbitsMessage) error {
+	log.Trace("processing GOSSIP message...")
+
 	_, err := h.parseTopic(message)
 	if err != nil {
 		return errors.Wrap(err, "error parsing topic: ")
@@ -160,13 +169,14 @@ func (h *HobbitsNode) processGossip(message HobbitsMessage) error {
 }
 
 func (h *HobbitsNode) parseMethodID(header []byte) (RPCMethod, error) {
+	log.Trace("attempting to parse method ID from header of RPC message...")
 	fmt.Println("parsing method ID from header...") // TODO delete
 
 	unmarshaledHeader := &RPCHeader{}
 
 	err := bson.Unmarshal(header, unmarshaledHeader)
 	if err != nil {
-		fmt.Println("could not unmarshal the header of the message: ") // TODO delete
+		log.Trace("could not unmarshal the header of the message: ") // TODO delete
 		return RPCMethod(0), errors.Wrap(err, "could not unmarshal the header of the message: ")
 	}
 
