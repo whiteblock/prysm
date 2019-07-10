@@ -1,3 +1,5 @@
+// TODO: update logging and printing
+
 package hobbits
 
 import (
@@ -23,8 +25,6 @@ func TestHobbitsNode_Listen(t *testing.T) {
 		hobNode.Listen()
 	}()
 
-	time.Sleep(3000000000)
-
 	for {
 		if hobNode.Server.Addr() != nil {
 			break
@@ -32,6 +32,8 @@ func TestHobbitsNode_Listen(t *testing.T) {
 
 		time.Sleep(1)
 	}
+
+	time.Sleep(30000000)
 
 	conn, err := net.Dial("tcp", hobNode.Server.Addr().String())
 	if err != nil {
@@ -61,18 +63,18 @@ func TestHobbitsNode_Listen(t *testing.T) {
 	}
 
 	msg := HobbitsMessage{
-		Version:  "12.4", // TODO: hits an error when over 2 decimals
+		Version:  uint32(3),
 		Protocol: encoding.RPC,
 		Header:   marshHeader,
 		Body:     marshBody,
 	}
 
-	toSend, err := encoding.Marshal(encoding.Message(msg))
+	toSend := encoding.Marshal(encoding.Message(msg))
 	if err != nil {
 		t.Errorf("could not marshal message for writing to conn")
 	}
 
-	_, err = conn.Write([]byte(toSend))
+	_, err = conn.Write(toSend)
 	if err != nil {
 		t.Error("could not write to the TCP server: ", err)
 	}

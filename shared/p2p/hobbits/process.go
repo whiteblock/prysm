@@ -6,9 +6,9 @@ import (
 	"net"
 	"reflect"
 
-	log "github.com/sirupsen/logrus"
 	"github.com/prysmaticlabs/prysm/shared/hashutil"
 	"github.com/renaynay/go-hobbits/encoding"
+	log "github.com/sirupsen/logrus"
 	"gopkg.in/mgo.v2/bson"
 
 	"github.com/pkg/errors"
@@ -48,10 +48,12 @@ func (h *HobbitsNode) processRPC(message HobbitsMessage, conn net.Conn) error {
 
 	switch method {
 	case HELLO:
+		fmt.Println("HELLO received") // TODO delete
 		log.Debug("HELLO received")
 
 		response := h.rpcHello()
 
+		fmt.Println("a HELLO response has been built...") // TODO Delete
 		log.Debug("a HELLO response has been built...")
 
 		responseBody, err := bson.Marshal(response)
@@ -66,6 +68,7 @@ func (h *HobbitsNode) processRPC(message HobbitsMessage, conn net.Conn) error {
 		err = h.Server.SendMessage(conn, encoding.Message(responseMessage))
 		if err != nil {
 			log.Debug("error sending a HELLO back") // TODO delete
+			fmt.Println("sending HELLO...") // TODO delete
 			return errors.Wrap(err, "error sending hobbits message: ")
 		}
 
@@ -170,7 +173,6 @@ func (h *HobbitsNode) processGossip(message HobbitsMessage) error {
 
 func (h *HobbitsNode) parseMethodID(header []byte) (RPCMethod, error) {
 	log.Debug("attempting to parse method ID from header of RPC message...")
-	fmt.Println("parsing method ID from header...") // TODO delete
 
 	unmarshaledHeader := &RPCHeader{}
 
